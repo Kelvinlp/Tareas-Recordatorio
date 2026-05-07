@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#D4782A" id="themeMetaColor">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MiAgenda">
+<meta name="description" content="Gestor personal de recordatorios, compras, pagos y cumpleaños">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<title>MiAgenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  /* Fondos */
+  --warm-bg:#FDF6EE;
+  --warm-surface:#FFF8F0;
+  --warm-card:#FFFCF7;
+  /* Ámbar */
+  --warm-amber:#D4782A;
+  --warm-amber-light:#F5C875;
+  --warm-amber-pale:#FEF3DC;
+  --warm-amber-hover:#B8611F;
+  /* Coral */
+  --warm-coral:#C45C35;
+  --warm-coral-light:#F09B78;
+  --warm-coral-pale:#FDEEE6;
+  /* Rosa */
+  --warm-rose:#B5485A;
+  --warm-rose-pale:#FDEDF0;
+  /* Verde */
+  --warm-green:#5A7A3A;
+  --warm-green-pale:#EEF5E5;
+  /* Azul */
+  --warm-blue:#3A5A7A;
+  --warm-blue-pale:#E5EEF5;
+  /* Texto */
+  --warm-text:#3D2B1F;
+  --warm-text-mid:#7A5C48;
+  --warm-text-light:#B09080;
+  /* Bordes y sombras */
+  --warm-border:#EDD9C5;
+  --warm-shadow:rgba(180,100,50,0.10);
+  --warm-shadow-md:rgba(180,100,50,0.18);
+  /* Safe area */
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  /* Transición global */
+  --t:0.22s cubic-bezier(.4,0,.2,1);
+}
+body{
+  font-family:'Lato',sans-serif;
+  background:var(--warm-bg);
+  color:var(--warm-text);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  padding-bottom:calc(var(--safe-bottom) + 70px);
+  transition:background var(--t),color var(--t);
+}
+h1,h2,h3{font-family:'Playfair Display',serif}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#C45C35 0%,#D4782A 50%,#E8A050 100%);
+  padding:calc(var(--safe-top) + 12px) 16px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 3px 12px rgba(180,80,30,0.25);
+  position:sticky;top:0;z-index:100;
+  transition:background var(--t),box-shadow var(--t);
+}
+.header-title{color:#FFF8EE;font-size:20px;letter-spacing:0.5px}
+.header-subtitle{color:rgba(255,240,220,0.85);font-size:11px;margin-top:1px}
+.header-right{display:flex;gap:6px;align-items:center}
+.header-btn{
+  background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);
+  color:#FFF8EE;border-radius:8px;padding:6px 9px;cursor:pointer;
+  font-size:13px;display:flex;align-items:center;gap:4px;transition:background 0.2s;
+  font-family:'Lato',sans-serif;font-weight:700;
+}
+.header-btn:hover{background:rgba(255,255,255,0.28)}
+.header-btn.notif-on{background:rgba(255,255,255,0.32);border-color:rgba(255,255,255,0.5)}
+.icon-circle-btn{
+  background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);
+  color:#FFF8EE;border-radius:8px;padding:6px 8px;cursor:pointer;font-size:17px;
+  display:flex;align-items:center;transition:background 0.2s;
+}
+.icon-circle-btn:hover{background:rgba(255,255,255,0.28)}
+
+/* NOTIF BANNER */
+.notif-alert{
+  background:linear-gradient(135deg,var(--warm-coral-pale),var(--warm-amber-pale));
+  border:1px solid var(--warm-amber-light);border-radius:12px;
+  padding:11px 14px;margin:12px 14px 0;display:none;
+}
+.notif-alert.show{display:block;animation:fadeIn 0.3s ease}
+.notif-title{font-weight:700;font-size:13px;color:var(--warm-coral);display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.notif-list{font-size:12px;color:var(--warm-text-mid);line-height:1.6}
+
+/* INSTALL BANNER */
+.install-banner{
+  background:linear-gradient(135deg,#3A5A7A,#5A7A3A);
+  color:#fff;padding:11px 16px;display:none;
+  align-items:center;gap:10px;font-size:13px;
+}
+.install-banner.show{display:flex}
+.install-banner button{
+  background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.4);
+  color:#fff;border-radius:7px;padding:5px 12px;cursor:pointer;
+  font-family:'Lato',sans-serif;font-weight:700;font-size:12px;
+  margin-left:auto;white-space:nowrap;
+}
+.install-banner button:hover{background:rgba(255,255,255,0.4)}
+.install-banner .dismiss{background:none;border:none;color:rgba(255,255,255,0.6);padding:5px;font-size:16px;cursor:pointer;margin-left:4px}
+
+/* NOTIF PERMISSION BANNER */
+.perm-banner{
+  background:linear-gradient(135deg,#6D3A7A,#9A4A30);
+  color:#fff;padding:11px 16px;display:none;
+  align-items:center;gap:10px;font-size:13px;
+}
+.perm-banner.show{display:flex}
+.perm-banner button{
+  background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.4);
+  color:#fff;border-radius:7px;padding:5px 12px;cursor:pointer;
+  font-family:'Lato',sans-serif;font-weight:700;font-size:12px;
+  margin-left:auto;white-space:nowrap;
+}
+.perm-banner .dismiss{background:none;border:none;color:rgba(255,255,255,0.6);padding:5px;font-size:16px;cursor:pointer;margin-left:4px}
+
+/* SEARCH */
+.search-bar{padding:10px 14px;background:var(--warm-surface);border-bottom:1px solid var(--warm-border);display:flex;gap:8px;transition:background var(--t),border-color var(--t)}
+.search-wrap{position:relative;flex:1}
+.search-input{
+  width:100%;border:1px solid var(--warm-border);background:var(--warm-card);
+  border-radius:10px;padding:8px 10px 8px 34px;font-size:14px;
+  color:var(--warm-text);font-family:'Lato',sans-serif;outline:none;
+  transition:border-color var(--t),box-shadow var(--t),background var(--t),color var(--t);
+}
+.search-input:focus{border-color:var(--warm-amber);box-shadow:0 0 0 3px rgba(212,120,42,0.15)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--warm-text-light);font-size:16px;pointer-events:none}
+.filter-sel{
+  border:1px solid var(--warm-border);background:var(--warm-card);
+  border-radius:10px;padding:8px;font-size:13px;color:var(--warm-text);
+  font-family:'Lato',sans-serif;cursor:pointer;outline:none;
+  transition:background var(--t),border-color var(--t),color var(--t);
+}
+
+/* BOTTOM TABS (mobile nav) */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;background:var(--warm-surface);
+  border-top:1.5px solid var(--warm-border);
+  padding-bottom:var(--safe-bottom);
+  z-index:100;box-shadow:0 -2px 12px var(--warm-shadow);
+  transition:background var(--t),border-color var(--t);
+}
+.tab{
+  flex:1;border:none;background:none;cursor:pointer;
+  font-family:'Lato',sans-serif;font-size:10px;font-weight:700;
+  color:var(--warm-text-light);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  padding:10px 4px 8px;position:relative;transition:color 0.2s;
+}
+.tab i{font-size:22px}
+.tab.active{color:var(--warm-amber)}
+.tab.active::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;
+  height:2.5px;background:var(--warm-amber);border-radius:0 0 3px 3px;
+}
+.tab:hover:not(.active){color:var(--warm-text-mid)}
+.tab-badge{
+  position:absolute;top:7px;right:calc(50% - 16px);
+  background:var(--warm-rose);color:#fff;
+  border-radius:10px;min-width:16px;height:16px;
+  font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid var(--warm-surface);
+}
+
+/* CONTENT PANELS */
+.panel{display:none;padding:14px;animation:fadeIn 0.22s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ADD BTN */
+.add-btn{
+  width:100%;background:var(--warm-amber-pale);
+  border:1.5px dashed var(--warm-amber-light);
+  border-radius:12px;padding:12px;cursor:pointer;
+  color:var(--warm-amber);font-family:'Lato',sans-serif;
+  font-size:14px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:all 0.2s;margin-bottom:12px;
+}
+.add-btn:hover{background:var(--warm-amber);color:#fff;border-style:solid}
+
+/* FORM CARD */
+.form-card{
+  background:var(--warm-card);border:1px solid var(--warm-border);
+  border-radius:14px;padding:14px;margin-bottom:12px;display:none;
+  box-shadow:0 2px 12px var(--warm-shadow);
+  transition:background var(--t),border-color var(--t);
+}
+.form-card.open{display:block;animation:fadeIn 0.2s ease}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:11px;font-weight:700;color:var(--warm-text-mid);text-transform:uppercase;letter-spacing:0.5px}
+.form-input,.form-select,.form-textarea{
+  border:1px solid var(--warm-border);background:var(--warm-bg);
+  border-radius:9px;padding:9px 11px;font-size:14px;color:var(--warm-text);
+  font-family:'Lato',sans-serif;outline:none;transition:border-color var(--t),box-shadow var(--t),background var(--t),color var(--t);
+  -webkit-appearance:none;appearance:none;
+}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B09080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--warm-amber);box-shadow:0 0 0 3px rgba(212,120,42,0.15)}
+.form-textarea{resize:vertical;min-height:65px}
+.priority-group{display:flex;gap:5px}
+.priority-btn{
+  flex:1;padding:7px 2px;border:1.5px solid var(--warm-border);
+  background:var(--warm-bg);border-radius:8px;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;font-family:'Lato',sans-serif;color:var(--warm-text-mid);
+}
+.priority-btn.alta.sel{background:#FDEEF0;border-color:#B5485A;color:#B5485A}
+.priority-btn.media.sel{background:var(--warm-amber-pale);border-color:var(--warm-amber);color:var(--warm-amber)}
+.priority-btn.baja.sel{background:var(--warm-green-pale);border-color:var(--warm-green);color:var(--warm-green)}
+.form-actions{display:flex;gap:8px;margin-top:12px}
+.btn-save{
+  flex:1;background:var(--warm-amber);color:#fff;border:none;
+  border-radius:9px;padding:11px;font-family:'Lato',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;transition:background 0.2s;
+}
+.btn-save:hover{background:var(--warm-coral)}
+.btn-cancel{
+  background:none;border:1px solid var(--warm-border);border-radius:9px;
+  padding:11px 14px;font-family:'Lato',sans-serif;font-size:14px;
+  color:var(--warm-text-mid);cursor:pointer;transition:background 0.2s;
+}
+.btn-cancel:hover{background:var(--warm-bg)}
+
+/* ITEM CARD */
+.item-card{
+  background:var(--warm-card);border:1px solid var(--warm-border);
+  border-radius:12px;padding:12px 12px 12px 16px;margin-bottom:9px;
+  display:flex;align-items:flex-start;gap:10px;
+  transition:box-shadow var(--t),background var(--t),border-color var(--t);position:relative;overflow:hidden;
+}
+.item-card:hover{box-shadow:0 3px 14px var(--warm-shadow)}
+.left-bar{width:4px;position:absolute;left:0;top:0;bottom:0;border-radius:12px 0 0 12px}
+.item-card.alta .left-bar{background:var(--warm-rose)}
+.item-card.media .left-bar{background:var(--warm-amber)}
+.item-card.baja .left-bar{background:var(--warm-green)}
+.item-card.none .left-bar{background:var(--warm-border)}
+.item-check{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--warm-border);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;margin-top:1px;
+}
+.item-check.done{background:var(--warm-green);border-color:var(--warm-green);color:#fff}
+.item-body{flex:1;min-width:0}
+.item-title{font-weight:700;font-size:14px;color:var(--warm-text);margin-bottom:3px;word-break:break-word}
+.item-title.done{text-decoration:line-through;color:var(--warm-text-light)}
+.item-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.item-date{font-size:11px;color:var(--warm-text-mid);display:flex;align-items:center;gap:3px}
+.badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:700}
+.badge.alta{background:var(--warm-rose-pale);color:var(--warm-rose)}
+.badge.media{background:var(--warm-amber-pale);color:var(--warm-amber)}
+.badge.baja{background:var(--warm-green-pale);color:var(--warm-green)}
+.item-comment{font-size:12px;color:var(--warm-text-light);margin-top:4px;font-style:italic}
+.item-actions{display:flex;gap:3px;flex-shrink:0}
+.icon-btn{
+  background:none;border:none;cursor:pointer;padding:5px;
+  border-radius:7px;color:var(--warm-text-light);font-size:16px;
+  transition:all 0.2s;display:flex;align-items:center;
+}
+.icon-btn:hover.edit{color:var(--warm-amber);background:var(--warm-amber-pale)}
+.icon-btn:hover.del{color:var(--warm-rose);background:var(--warm-rose-pale)}
+.shop-qty{font-size:11px;background:var(--warm-amber-pale);color:var(--warm-amber);padding:1px 6px;border-radius:20px;font-weight:700;margin-left:4px}
+.pay-freq{font-size:11px;background:var(--warm-blue-pale);color:var(--warm-blue);padding:2px 7px;border-radius:20px;font-weight:700}
+.pay-amount{font-size:13px;font-weight:700;color:var(--warm-coral)}
+.bday-age{font-size:11px;background:var(--warm-rose-pale);color:var(--warm-rose);padding:2px 7px;border-radius:20px;font-weight:700}
+.bday-countdown{font-size:12px;color:var(--warm-text-mid);margin-top:3px;display:flex;align-items:center;gap:4px}
+.bday-countdown.soon{color:var(--warm-rose);font-weight:700}
+.empty{text-align:center;padding:40px 20px;color:var(--warm-text-light)}
+.empty i{font-size:44px;margin-bottom:10px;display:block;opacity:0.4}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.section-title{font-size:15px;color:var(--warm-text-mid)}
+.count-badge{background:var(--warm-amber-pale);color:var(--warm-amber);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+.clear-btn{
+  background:var(--warm-amber-pale);border:1px solid var(--warm-amber-light);
+  color:var(--warm-amber);border-radius:8px;padding:6px 11px;cursor:pointer;
+  font-size:12px;display:flex;align-items:center;gap:5px;font-family:'Lato',sans-serif;font-weight:700;
+  margin-bottom:11px;transition:all 0.2s;
+}
+.clear-btn:hover{background:var(--warm-amber);color:#fff}
+
+/* ===== DARK MODE — Paleta carbón-ámbar ===== */
+body.dark{
+  /* Fondos escalonados profundos */
+  --warm-bg:           #0F0A06;
+  --warm-surface:      #1A1108;
+  --warm-card:         #221608;
+  /* Ámbar vibrante sobre oscuro */
+  --warm-amber:        #E8922A;
+  --warm-amber-light:  #C8781E;
+  --warm-amber-pale:   rgba(232,146,42,0.14);
+  --warm-amber-hover:  #F5A83A;
+  /* Coral */
+  --warm-coral:        #D4704A;
+  --warm-coral-light:  #B85535;
+  --warm-coral-pale:   rgba(212,112,74,0.14);
+  /* Rosa */
+  --warm-rose:         #D06070;
+  --warm-rose-pale:    rgba(208,96,112,0.14);
+  /* Verde */
+  --warm-green:        #7AAA50;
+  --warm-green-pale:   rgba(122,170,80,0.14);
+  /* Azul */
+  --warm-blue:         #5A8AAA;
+  --warm-blue-pale:    rgba(90,138,170,0.14);
+  /* Texto */
+  --warm-text:         #F0E0C8;
+  --warm-text-mid:     #C09878;
+  --warm-text-light:   #7A5838;
+  /* Bordes y sombras */
+  --warm-border:       #3A2818;
+  --warm-shadow:       rgba(0,0,0,0.45);
+  --warm-shadow-md:    rgba(0,0,0,0.65);
+}
+body.dark .header{
+  background:linear-gradient(135deg,#2A1205 0%,#3D1C08 50%,#501F08 100%);
+  box-shadow:0 3px 20px rgba(0,0,0,0.65);
+}
+body.dark .form-select{background-color:var(--warm-bg)}
+body.dark .tabs{box-shadow:0 -2px 16px rgba(0,0,0,0.55)}
+body.dark .notif-alert{
+  background:linear-gradient(135deg,rgba(212,112,74,0.12),rgba(232,146,42,0.10));
+  border-color:var(--warm-amber);
+}
+body.dark .notif-title{color:var(--warm-amber)}
+body.dark .toast{background:#F0E0C8;color:#0F0A06}
+/* Scrollbar dark */
+body.dark ::-webkit-scrollbar{width:5px;height:5px}
+body.dark ::-webkit-scrollbar-track{background:var(--warm-surface)}
+body.dark ::-webkit-scrollbar-thumb{background:var(--warm-border);border-radius:3px}
+body.dark ::-webkit-scrollbar-thumb:hover{background:var(--warm-amber)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:calc(var(--safe-bottom) + 80px);left:50%;transform:translateX(-50%) translateY(20px);
+  background:#3D2B1F;color:#FFF8EE;border-radius:10px;padding:10px 18px;
+  font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;
+  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* NOTIF STATUS */
+.notif-status{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;padding:2px 7px;border-radius:20px;font-weight:700;
+}
+.notif-status.granted{background:var(--warm-green-pale);color:var(--warm-green)}
+.notif-status.denied{background:var(--warm-rose-pale);color:var(--warm-rose)}
+.notif-status.default{background:var(--warm-amber-pale);color:var(--warm-amber)}
+
+@media(max-width:380px){
+  .form-row{grid-template-columns:1fr}
+  .header-title{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title"><i class="ti ti-bookmarks" style="margin-right:5px;font-size:18px;vertical-align:-2px" aria-hidden="true"></i>MiAgenda</div>
+    <div class="header-subtitle" id="today-date"></div>
+  </div>
+  <div class="header-right">
+    <button class="header-btn" id="notifBtn" onclick="requestNotifPermission()" aria-label="Activar notificaciones">
+      <i class="ti ti-bell" id="notifIcon"></i>
+    </button>
+    <button class="icon-circle-btn" onclick="exportData()" aria-label="Exportar datos"><i class="ti ti-download"></i></button>
+    <button class="icon-circle-btn" onclick="document.getElementById('importFile').click()" aria-label="Importar datos"><i class="ti ti-upload"></i></button>
+    <button class="icon-circle-btn" onclick="toggleDark()" id="darkBtn" aria-label="Modo oscuro"><i class="ti ti-moon"></i></button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <i class="ti ti-device-mobile" style="font-size:20px;flex-shrink:0"></i>
+  <span>¡Instala MiAgenda en tu teléfono para usarla sin internet!</span>
+  <button onclick="installApp()">Instalar</button>
+  <button class="dismiss" onclick="dismissInstall()" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+</div>
+
+<!-- NOTIFICATION PERMISSION BANNER -->
+<div class="perm-banner" id="permBanner">
+  <i class="ti ti-bell-ringing" style="font-size:20px;flex-shrink:0"></i>
+  <span>Activa las notificaciones para recibir alertas de tus recordatorios</span>
+  <button onclick="requestNotifPermission()">Activar</button>
+  <button class="dismiss" onclick="document.getElementById('permBanner').classList.remove('show')" aria-label="Cerrar"><i class="ti ti-x"></i></button>
+</div>
+
+<!-- ALERTS PANEL -->
+<div id="notifAlert" class="notif-alert">
+  <div class="notif-title"><i class="ti ti-bell-ringing" aria-hidden="true"></i> Próximas alertas</div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <div class="search-wrap">
+    <i class="ti ti-search search-icon" aria-hidden="true"></i>
+    <input type="search" class="search-input" id="searchInput" placeholder="Buscar..." oninput="renderAll()" autocomplete="off">
+  </div>
+  <select class="filter-sel" id="filterPriority" onchange="renderAll()">
+    <option value="">Todas</option>
+    <option value="alta">Alta</option>
+    <option value="media">Media</option>
+    <option value="baja">Baja</option>
+  </select>
+</div>
+
+<!-- PANELS -->
+<div id="panel-recordatorios" class="panel active">
+  <div style="height:4px"></div>
+  <button class="add-btn" onclick="toggleForm('rec-form')"><i class="ti ti-plus" aria-hidden="true"></i> Nuevo recordatorio</button>
+  <div class="form-card" id="rec-form">
+    <div class="form-row full"><div class="form-group"><label class="form-label">Título *</label><input class="form-input" id="rec-title" placeholder="¿Qué necesitas recordar?"></div></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fecha y hora</label><input type="datetime-local" class="form-input" id="rec-date"></div>
+      <div class="form-group"><label class="form-label">Prioridad</label>
+        <div class="priority-group">
+          <button class="priority-btn alta" onclick="selPriority(this,'alta')">Alta</button>
+          <button class="priority-btn media sel" onclick="selPriority(this,'media')">Media</button>
+          <button class="priority-btn baja" onclick="selPriority(this,'baja')">Baja</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label class="form-label">Comentario</label><textarea class="form-textarea" id="rec-comment" placeholder="Notas adicionales..."></textarea></div></div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveItem('recordatorios')">Guardar</button>
+      <button class="btn-cancel" onclick="toggleForm('rec-form')">Cancelar</button>
+    </div>
+  </div>
+  <div class="section-header">
+    <span class="section-title">Tus recordatorios</span>
+    <span class="count-badge" id="count-recordatorios">0</span>
+  </div>
+  <div id="list-recordatorios"></div>
+</div>
+
+<div id="panel-compras" class="panel">
+  <div style="height:4px"></div>
+  <button class="add-btn" onclick="toggleForm('shop-form')"><i class="ti ti-plus" aria-hidden="true"></i> Agregar item</button>
+  <div class="form-card" id="shop-form">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Producto *</label><input class="form-input" id="shop-title" placeholder="¿Qué necesitas?"></div>
+      <div class="form-group"><label class="form-label">Cantidad</label><input class="form-input" id="shop-qty" placeholder="ej: 2 kg, 3 und"></div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label class="form-label">Comentario</label><textarea class="form-textarea" id="shop-comment" placeholder="Marca, especificaciones..."></textarea></div></div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveItem('compras')">Guardar</button>
+      <button class="btn-cancel" onclick="toggleForm('shop-form')">Cancelar</button>
+    </div>
+  </div>
+  <button class="clear-btn" onclick="clearDoneShop()"><i class="ti ti-trash" aria-hidden="true"></i> Limpiar comprados</button>
+  <div class="section-header">
+    <span class="section-title">Lista de compras</span>
+    <span class="count-badge" id="count-compras">0</span>
+  </div>
+  <div id="list-compras"></div>
+</div>
+
+<div id="panel-pagos" class="panel">
+  <div style="height:4px"></div>
+  <button class="add-btn" onclick="toggleForm('pay-form')"><i class="ti ti-plus" aria-hidden="true"></i> Nuevo pago recurrente</button>
+  <div class="form-card" id="pay-form">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Concepto *</label><input class="form-input" id="pay-title" placeholder="Netflix, alquiler..."></div>
+      <div class="form-group"><label class="form-label">Monto</label><input type="number" class="form-input" id="pay-amount" placeholder="0.00"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Próximo pago</label><input type="date" class="form-input" id="pay-date"></div>
+      <div class="form-group"><label class="form-label">Frecuencia</label>
+        <select class="form-select" id="pay-freq">
+          <option value="mensual">Mensual</option>
+          <option value="semanal">Semanal</option>
+          <option value="quincenal">Quincenal</option>
+          <option value="anual">Anual</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label class="form-label">Comentario</label><textarea class="form-textarea" id="pay-comment" placeholder="Notas..."></textarea></div></div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveItem('pagos')">Guardar</button>
+      <button class="btn-cancel" onclick="toggleForm('pay-form')">Cancelar</button>
+    </div>
+  </div>
+  <div class="section-header">
+    <span class="section-title">Pagos recurrentes</span>
+    <span class="count-badge" id="count-pagos">0</span>
+  </div>
+  <div id="list-pagos"></div>
+</div>
+
+<div id="panel-cumpleanos" class="panel">
+  <div style="height:4px"></div>
+  <button class="add-btn" onclick="toggleForm('bday-form')"><i class="ti ti-plus" aria-hidden="true"></i> Agregar cumpleaños</button>
+  <div class="form-card" id="bday-form">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" id="bday-title" placeholder="Nombre de la persona"></div>
+      <div class="form-group"><label class="form-label">Fecha de nacimiento</label><input type="date" class="form-input" id="bday-date"></div>
+    </div>
+    <div class="form-row full"><div class="form-group"><label class="form-label">Comentario</label><textarea class="form-textarea" id="bday-comment" placeholder="Ideas de regalo, notas..."></textarea></div></div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveItem('cumpleanos')">Guardar</button>
+      <button class="btn-cancel" onclick="toggleForm('bday-form')">Cancelar</button>
+    </div>
+  </div>
+  <div class="section-header">
+    <span class="section-title">Cumpleaños</span>
+    <span class="count-badge" id="count-cumpleanos">0</span>
+  </div>
+  <div id="list-cumpleanos"></div>
+</div>
+
+<!-- BOTTOM NAV TABS -->
+<nav class="tabs" role="tablist" aria-label="Secciones">
+  <button class="tab active" onclick="switchTab('recordatorios',this)" role="tab" aria-selected="true" aria-controls="panel-recordatorios">
+    <i class="ti ti-calendar-event" aria-hidden="true"></i>
+    <span>Agenda</span>
+  </button>
+  <button class="tab" onclick="switchTab('compras',this)" role="tab" aria-selected="false" aria-controls="panel-compras">
+    <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+    <span>Compras</span>
+    <span class="tab-badge" id="badge-compras" style="display:none"></span>
+  </button>
+  <button class="tab" onclick="switchTab('pagos',this)" role="tab" aria-selected="false" aria-controls="panel-pagos">
+    <i class="ti ti-credit-card" aria-hidden="true"></i>
+    <span>Pagos</span>
+    <span class="tab-badge" id="badge-pagos" style="display:none"></span>
+  </button>
+  <button class="tab" onclick="switchTab('cumpleanos',this)" role="tab" aria-selected="false" aria-controls="panel-cumpleanos">
+    <i class="ti ti-cake" aria-hidden="true"></i>
+    <span>Cumples</span>
+    <span class="tab-badge" id="badge-cumpleanos" style="display:none"></span>
+  </button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================
+// STATE & STORAGE
+// ========================
+let state = { recordatorios:[], compras:[], pagos:[], cumpleanos:[] };
+let editTarget = null;
+let currentPriority = 'media';
+let darkMode = false;
+let deferredInstallPrompt = null;
+let notifCheckInterval = null;
+
+function save() {
+  try { localStorage.setItem('miagenda', JSON.stringify(state)); } catch(e) {}
+}
+function load() {
+  try { const d = localStorage.getItem('miagenda'); if(d) state = JSON.parse(d); } catch(e) {}
+}
+
+// ========================
+// FIREBASE CONFIG
+// ========================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAyxW4KZlWVHwlkudzJZIncCau6qtAeNlo",
+  authDomain: "tareas-task.firebaseapp.com",
+  projectId: "tareas-task",
+  storageBucket: "tareas-task.firebasestorage.app",
+  messagingSenderId: "850116411488",
+  appId: "1:850116411488:web:a19f550de6eb2002d30305"
+};
+const VAPID_KEY = "BHOZc4nCiobdl3YA4EV3gBuezHxXHqqCs9HPO1vHm8P6aioRzHhmaLO2268NGi_x9cd0vnk06Wb3Jy8D6_ixOec";
+let fcmMessaging = null;
+let fcmToken = null;
+
+// ========================
+// SERVICE WORKER & PWA
+// ========================
+async function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    // Usar firebase-messaging-sw.js como SW único (caché + FCM)
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+    console.log('SW registrado:', reg.scope);
+    return reg;
+  } catch(e) {
+    console.warn('SW registration failed:', e);
+  }
+}
+
+// ========================
+// INICIALIZAR FIREBASE FCM
+// ========================
+async function initFirebase() {
+  if (typeof firebase === 'undefined') {
+    console.warn('Firebase SDK no cargado aún');
+    return;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fcmMessaging = firebase.messaging();
+
+    // Notificaciones en FOREGROUND (app abierta)
+    fcmMessaging.onMessage((payload) => {
+      console.log('FCM foreground:', payload);
+      const title = payload.notification?.title || 'MiAgenda';
+      const body  = payload.notification?.body  || 'Tienes una alerta';
+      if (Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification(title, {
+            body, icon: '/icons/icon-192.png', badge: '/icons/icon-96.png',
+            vibrate: [200, 100, 200], tag: 'miagenda-fg-' + Date.now()
+          });
+        });
+      }
+      checkInAppAlerts();
+    });
+    console.log('Firebase FCM listo');
+  } catch(e) { console.warn('Firebase init error:', e); }
+}
+
+// ========================
+// OBTENER TOKEN FCM
+// ========================
+async function getFCMToken() {
+  if (!fcmMessaging) return null;
+  try {
+    const swReg = await navigator.serviceWorker.ready;
+    const token = await fcmMessaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+    if (token) {
+      fcmToken = token;
+      localStorage.setItem('miagenda-fcm-token', token);
+      console.log('FCM Token:', token);
+      scheduleAlertsViaFCM(token);
+      return token;
+    }
+  } catch(e) { console.warn('Error FCM token:', e); }
+  return null;
+}
+
+// ========================
+// REGISTRAR ALERTAS PRÓXIMAS
+// ========================
+function scheduleAlertsViaFCM(token) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const upcoming = [];
+  state.recordatorios.forEach(item => {
+    if (!item.done && item.date) {
+      const diff = Math.round((new Date(item.date) - now) / 86400000);
+      if (diff >= 0 && diff <= 3)
+        upcoming.push({ title: diff===0?'📌 Recordatorio hoy':`📌 En ${diff} día${diff>1?'s':''}`, body: item.title, tag: 'rec-'+item.id });
+    }
+  });
+  state.cumpleanos.forEach(item => {
+    const days = daysUntilBirthday(item.date);
+    if (days !== null && days <= 3)
+      upcoming.push({ title: days===0?'🎂 ¡Cumpleaños hoy!':`🎂 Cumpleaños en ${days} día${days>1?'s':''}`, body: item.title, tag: 'bday-'+item.id });
+  });
+  state.pagos.forEach(item => {
+    if (item.date) {
+      const next = nextPaymentDate(item.date, item.freq);
+      if (next) {
+        const diff = Math.round((new Date(next) - now) / 86400000);
+        if (diff >= 0 && diff <= 3)
+          upcoming.push({ title: diff===0?'💳 Pago vence hoy':`💳 Pago en ${diff} día${diff>1?'s':''}`, body: item.title+(item.amount?` — $${parseFloat(item.amount).toFixed(2)}`:''), tag:'pay-'+item.id });
+      }
+    }
+  });
+  localStorage.setItem('miagenda-pending-alerts', JSON.stringify({ token, alerts: upcoming, updated: new Date().toISOString() }));
+  console.log(`${upcoming.length} alertas próximas guardadas`);
+}
+
+// Install prompt
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const dismissed = localStorage.getItem('miagenda-install-dismissed');
+  if (!dismissed) {
+    document.getElementById('installBanner').classList.add('show');
+  }
+});
+
+async function installApp() {
+  if (!deferredInstallPrompt) {
+    showToast('✓ La app ya está instalada o usa el menú del navegador', 3000);
+    return;
+  }
+  document.getElementById('installBanner').classList.remove('show');
+  const result = await deferredInstallPrompt.prompt();
+  deferredInstallPrompt = null;
+  if (result.outcome === 'accepted') {
+    showToast('🎉 ¡MiAgenda instalada correctamente!', 3000);
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('miagenda-install-dismissed', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+  showToast('✓ App instalada. ¡Búscala en tu pantalla de inicio!', 4000);
+});
+
+// ========================
+// NOTIFICATIONS
+// ========================
+function updateNotifButton() {
+  const btn = document.getElementById('notifBtn');
+  const icon = document.getElementById('notifIcon');
+  const perm = Notification.permission;
+  if (perm === 'granted') {
+    icon.className = 'ti ti-bell-check';
+    btn.classList.add('notif-on');
+    btn.title = 'Notificaciones activas';
+    document.getElementById('permBanner').classList.remove('show');
+  } else if (perm === 'denied') {
+    icon.className = 'ti ti-bell-off';
+    btn.classList.remove('notif-on');
+    btn.title = 'Notificaciones bloqueadas (actívalas en configuración del navegador)';
+  } else {
+    icon.className = 'ti ti-bell';
+    btn.classList.remove('notif-on');
+    btn.title = 'Activar notificaciones';
+    if (!localStorage.getItem('miagenda-notif-dismissed')) {
+      setTimeout(() => document.getElementById('permBanner').classList.add('show'), 1500);
+    }
+  }
+}
+
+async function requestNotifPermission() {
+  document.getElementById('permBanner').classList.remove('show');
+  localStorage.setItem('miagenda-notif-dismissed', '1');
+
+  if (!('Notification' in window)) {
+    showToast('⚠ Tu navegador no soporta notificaciones', 3000);
+    return;
+  }
+  if (Notification.permission === 'denied') {
+    showToast('🔔 Activa las notificaciones en Ajustes > Sitio web', 4000);
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    showToast('✓ Las notificaciones ya están activas', 3000);
+    sendTestNotification();
+    return;
+  }
+
+  const perm = await Notification.requestPermission();
+  updateNotifButton();
+  if (perm === 'granted') {
+    showToast('🔔 ¡Notificaciones activadas!', 3000);
+    startNotifChecker();
+    sendTestNotification();
+    // Obtener token FCM para notificaciones en background
+    await initFirebase();
+    await getFCMToken();
+  } else {
+    showToast('Notificaciones desactivadas. Puedes cambiarlas en ajustes.', 3500);
+  }
+}
+
+function sendTestNotification() {
+  setTimeout(() => {
+    sendNotification('MiAgenda ✓', 'Las notificaciones están funcionando correctamente', { tag: 'test' });
+  }, 500);
+}
+
+async function sendNotification(title, body, options = {}) {
+  if (Notification.permission !== 'granted') return;
+
+  const sw = navigator.serviceWorker && await navigator.serviceWorker.ready;
+  const opts = {
+    body,
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    vibrate: [150, 50, 150],
+    tag: options.tag || 'miagenda-' + Date.now(),
+    requireInteraction: options.requireInteraction || false,
+    silent: options.silent || false,
+    ...options
+  };
+
+  try {
+    if (sw && sw.showNotification) {
+      await sw.showNotification(title, opts);
+    } else {
+      new Notification(title, opts);
+    }
+  } catch(e) {
+    // Fallback
+    try { new Notification(title, opts); } catch(e2) { console.warn('Notification failed:', e2); }
+  }
+}
+
+function startNotifChecker() {
+  if (notifCheckInterval) clearInterval(notifCheckInterval);
+  checkAndSendAlerts();
+  notifCheckInterval = setInterval(checkAndSendAlerts, 60 * 60 * 1000); // every hour
+}
+
+function checkAndSendAlerts() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const sentKey = 'miagenda-sent-' + now.toISOString().slice(0,10);
+  const sentToday = JSON.parse(localStorage.getItem(sentKey) || '[]');
+
+  const alerts = [];
+
+  state.recordatorios.forEach(item => {
+    if (!item.done && item.date) {
+      const d = new Date(item.date);
+      const diff = Math.round((d - now) / 86400000);
+      if (diff >= 0 && diff <= 1 && !sentToday.includes(item.id)) {
+        alerts.push({
+          id: item.id,
+          title: diff === 0 ? '📌 Recordatorio hoy' : '📌 Recordatorio mañana',
+          body: item.title + (item.comment ? ' — ' + item.comment : ''),
+          requireInteraction: item.priority === 'alta'
+        });
+      }
+    }
+  });
+
+  state.cumpleanos.forEach(item => {
+    const days = daysUntilBirthday(item.date);
+    if (days !== null && days <= 3 && !sentToday.includes('bday-' + item.id)) {
+      alerts.push({
+        id: 'bday-' + item.id,
+        title: days === 0 ? '🎂 ¡Cumpleaños hoy!' : `🎂 Cumpleaños en ${days} día${days>1?'s':''}`,
+        body: item.title + (days === 0 ? ' ¡No olvides felicitarle!' : ''),
+        requireInteraction: days === 0
+      });
+    }
+  });
+
+  state.pagos.forEach(item => {
+    if (item.date) {
+      const next = nextPaymentDate(item.date, item.freq);
+      if (next) {
+        const diff = Math.round((new Date(next) - now) / 86400000);
+        const pid = 'pay-' + item.id + '-' + next;
+        if (diff >= 0 && diff <= 3 && !sentToday.includes(pid)) {
+          alerts.push({
+            id: pid,
+            title: diff === 0 ? '💳 Pago vence hoy' : `💳 Pago en ${diff} día${diff>1?'s':''}`,
+            body: item.title + (item.amount ? ' — $' + parseFloat(item.amount).toFixed(2) : '')
+          });
+        }
+      }
+    }
+  });
+
+  alerts.forEach(alert => {
+    sendNotification(alert.title, alert.body, { tag: alert.id, requireInteraction: alert.requireInteraction });
+    sentToday.push(alert.id);
+  });
+
+  if (alerts.length) {
+    localStorage.setItem(sentKey, JSON.stringify(sentToday));
+  }
+}
+
+// ========================
+// INIT
+// ========================
+function init() {
+  load();
+  registerSW();
+
+  const dm = localStorage.getItem('miagenda-dark');
+  if (dm === '1') { darkMode = true; document.body.classList.add('dark'); document.getElementById('darkBtn').innerHTML = '<i class="ti ti-sun"></i>'; }
+
+  const now = new Date();
+  document.getElementById('today-date').textContent = now.toLocaleDateString('es-ES', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  if ('Notification' in window) {
+    updateNotifButton();
+    if (Notification.permission === 'granted') {
+      startNotifChecker();
+      // Si ya tenía permiso, inicializar Firebase y refrescar token
+      initFirebase().then(() => getFCMToken());
+    }
+  } else {
+    document.getElementById('notifBtn').style.display = 'none';
+  }
+
+  // Handle hash navigation
+  const hash = location.hash.replace('#','');
+  if (['recordatorios','compras','pagos','cumpleanos'].includes(hash)) {
+    const tab = document.querySelector(`[aria-controls="panel-${hash}"]`);
+    if (tab) switchTab(hash, tab);
+  }
+
+  renderAll();
+  checkInAppAlerts();
+}
+
+// ========================
+// TABS
+// ========================
+function switchTab(tab, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.getElementById('panel-'+tab).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  location.hash = tab;
+  window.scrollTo(0,0);
+}
+
+// ========================
+// FORMS
+// ========================
+function toggleForm(id) {
+  const f = document.getElementById(id);
+  const wasOpen = f.classList.contains('open');
+  f.classList.toggle('open');
+  if (!wasOpen) {
+    setTimeout(() => f.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  } else {
+    editTarget = null;
+    clearForms();
+  }
+}
+
+function clearForms() {
+  ['rec-title','rec-date','rec-comment','shop-title','shop-qty','shop-comment',
+   'pay-title','pay-amount','pay-date','pay-comment','bday-title','bday-date','bday-comment']
+  .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  currentPriority = 'media';
+  document.querySelectorAll('.priority-btn').forEach(b => { b.classList.remove('sel'); if(b.classList.contains('media')) b.classList.add('sel'); });
+}
+
+function selPriority(btn, val) {
+  currentPriority = val;
+  btn.closest('.priority-group').querySelectorAll('.priority-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+// ========================
+// SAVE ITEM
+// ========================
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function saveItem(type) {
+  let item = {};
+  if (type === 'recordatorios') {
+    const title = document.getElementById('rec-title').value.trim();
+    if (!title) { document.getElementById('rec-title').focus(); showToast('⚠ Escribe un título'); return; }
+    item = { id:editTarget||genId(), title, date:document.getElementById('rec-date').value, priority:currentPriority, comment:document.getElementById('rec-comment').value.trim(), done:false };
+  } else if (type === 'compras') {
+    const title = document.getElementById('shop-title').value.trim();
+    if (!title) { document.getElementById('shop-title').focus(); showToast('⚠ Escribe un producto'); return; }
+    item = { id:editTarget||genId(), title, qty:document.getElementById('shop-qty').value.trim(), comment:document.getElementById('shop-comment').value.trim(), done:false };
+  } else if (type === 'pagos') {
+    const title = document.getElementById('pay-title').value.trim();
+    if (!title) { document.getElementById('pay-title').focus(); showToast('⚠ Escribe el concepto'); return; }
+    item = { id:editTarget||genId(), title, amount:document.getElementById('pay-amount').value, date:document.getElementById('pay-date').value, freq:document.getElementById('pay-freq').value, comment:document.getElementById('pay-comment').value.trim() };
+  } else if (type === 'cumpleanos') {
+    const title = document.getElementById('bday-title').value.trim();
+    if (!title) { document.getElementById('bday-title').focus(); showToast('⚠ Escribe un nombre'); return; }
+    item = { id:editTarget||genId(), title, date:document.getElementById('bday-date').value, comment:document.getElementById('bday-comment').value.trim() };
+  }
+
+  if (editTarget) {
+    const idx = state[type].findIndex(x => x.id === editTarget);
+    if (idx !== -1) {
+      const prev = state[type][idx];
+      if ('done' in prev) item.done = prev.done;
+      state[type][idx] = item;
+    }
+  } else {
+    state[type].unshift(item);
+  }
+
+  editTarget = null;
+  save(); renderAll(); checkInAppAlerts();
+  const formMap = {recordatorios:'rec-form',compras:'shop-form',pagos:'pay-form',cumpleanos:'bday-form'};
+  document.getElementById(formMap[type]).classList.remove('open');
+  clearForms();
+  showToast('✓ Guardado');
+}
+
+// ========================
+// RENDER
+// ========================
+function getFilter() {
+  return { q:document.getElementById('searchInput').value.toLowerCase(), pri:document.getElementById('filterPriority').value };
+}
+function matchesFilter(item, f) {
+  if (f.q && !item.title.toLowerCase().includes(f.q) && !(item.comment||'').toLowerCase().includes(f.q)) return false;
+  if (f.pri && item.priority && item.priority !== f.pri) return false;
+  return true;
+}
+function renderAll() { renderRecordatorios(); renderCompras(); renderPagos(); renderCumpleanos(); updateBadges(); }
+
+function fmtDT(val) {
+  if (!val) return '';
+  const d = new Date(val); if(isNaN(d)) return val;
+  return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtD(val) {
+  if (!val) return '';
+  const d = new Date(val+'T12:00:00'); if(isNaN(d)) return val;
+  return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
+}
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function daysUntilBirthday(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr+'T12:00:00'); if(isNaN(d)) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const next = new Date(now.getFullYear(), d.getMonth(), d.getDate());
+  if (next < now) next.setFullYear(next.getFullYear()+1);
+  return Math.round((next-now)/86400000);
+}
+
+function nextPaymentDate(dateStr, freq) {
+  if (!dateStr) return '';
+  let d = new Date(dateStr+'T12:00:00');
+  const now = new Date(); now.setHours(0,0,0,0);
+  let safe = 0;
+  while (d < now && safe++ < 500) {
+    if (freq==='semanal') d.setDate(d.getDate()+7);
+    else if (freq==='quincenal') d.setDate(d.getDate()+15);
+    else if (freq==='anual') d.setFullYear(d.getFullYear()+1);
+    else d.setMonth(d.getMonth()+1);
+  }
+  return d.toISOString().slice(0,10);
+}
+
+function itemCardHTML(item, type) {
+  const actions = `
+    <div class="item-actions">
+      <button class="icon-btn edit" onclick="editItem('${type}','${item.id}')" aria-label="Editar"><i class="ti ti-edit" aria-hidden="true"></i></button>
+      <button class="icon-btn del" onclick="deleteItem('${type}','${item.id}')" aria-label="Eliminar"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>`;
+
+  if (type === 'recordatorios') {
+    return `<div class="item-card ${item.priority||'none'}" id="card-${item.id}">
+      <div class="left-bar"></div>
+      <div class="item-check ${item.done?'done':''}" onclick="toggleDone('recordatorios','${item.id}')" role="checkbox" aria-checked="${item.done}">
+        ${item.done?'<i class="ti ti-check" aria-hidden="true"></i>':''}
+      </div>
+      <div class="item-body">
+        <div class="item-title ${item.done?'done':''}">${esc(item.title)}</div>
+        <div class="item-meta">
+          ${item.date?`<span class="item-date"><i class="ti ti-clock" aria-hidden="true" style="font-size:11px"></i>${fmtDT(item.date)}</span>`:''}
+          ${item.priority?`<span class="badge ${item.priority}">${{alta:'Alta',media:'Media',baja:'Baja'}[item.priority]}</span>`:''}
+        </div>
+        ${item.comment?`<div class="item-comment">${esc(item.comment)}</div>`:''}
+      </div>${actions}</div>`;
+  }
+  if (type === 'compras') {
+    return `<div class="item-card none" id="card-${item.id}" style="opacity:${item.done?0.6:1}">
+      <div class="left-bar" style="background:${item.done?'var(--warm-green)':'var(--warm-amber)'}"></div>
+      <div class="item-check ${item.done?'done':''}" onclick="toggleDone('compras','${item.id}')" role="checkbox" aria-checked="${item.done}">
+        ${item.done?'<i class="ti ti-check" aria-hidden="true"></i>':''}
+      </div>
+      <div class="item-body">
+        <div class="item-title ${item.done?'done':''}">${esc(item.title)}${item.qty?`<span class="shop-qty">${esc(item.qty)}</span>`:''}</div>
+        ${item.comment?`<div class="item-comment">${esc(item.comment)}</div>`:''}
+      </div>${actions}</div>`;
+  }
+  if (type === 'pagos') {
+    const next = item.date ? nextPaymentDate(item.date, item.freq) : '';
+    const daysLeft = next ? Math.round((new Date(next)-new Date(new Date().setHours(0,0,0,0)))/86400000) : null;
+    return `<div class="item-card media" id="card-${item.id}">
+      <div class="left-bar" style="background:var(--warm-blue)"></div>
+      <div class="item-body" style="margin-left:8px">
+        <div class="item-title" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+          ${esc(item.title)}
+          ${item.amount?`<span class="pay-amount">$${parseFloat(item.amount).toFixed(2)}</span>`:''}
+          <span class="pay-freq">${item.freq||'mensual'}</span>
+        </div>
+        <div class="item-meta">
+          ${next?`<span class="item-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:11px"></i>Próximo: ${fmtD(next)}</span>`:''}
+          ${daysLeft!==null?`<span class="badge ${daysLeft<=3?'alta':daysLeft<=7?'media':'baja'}">${daysLeft<=0?'Vence hoy':daysLeft===1?'Mañana':'En '+daysLeft+' días'}</span>`:''}
+        </div>
+        ${item.comment?`<div class="item-comment">${esc(item.comment)}</div>`:''}
+      </div>${actions}</div>`;
+  }
+  if (type === 'cumpleanos') {
+    const days = daysUntilBirthday(item.date);
+    const birthYear = item.date ? new Date(item.date+'T12:00:00').getFullYear() : null;
+    const age = birthYear ? new Date().getFullYear() - birthYear : null;
+    const soon = days !== null && days <= 7;
+    return `<div class="item-card none" id="card-${item.id}">
+      <div class="left-bar" style="background:var(--warm-rose)"></div>
+      <div style="font-size:24px;margin:0 2px 0 6px;line-height:1" aria-hidden="true">🎂</div>
+      <div class="item-body">
+        <div class="item-title" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+          ${esc(item.title)}${age!==null?`<span class="bday-age">${age} años</span>`:''}
+        </div>
+        <div class="item-meta">
+          ${item.date?`<span class="item-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:11px"></i>${fmtD(item.date)}</span>`:''}
+        </div>
+        ${days!==null?`<div class="bday-countdown ${soon?'soon':''}"><i class="ti ti-${soon?'alarm':'hourglass'}" aria-hidden="true"></i>${days===0?'¡Hoy es su cumpleaños! 🎉':days===1?'¡Mañana es su cumpleaños!':'Faltan '+days+' días'}</div>`:''}
+        ${item.comment?`<div class="item-comment">${esc(item.comment)}</div>`:''}
+      </div>${actions}</div>`;
+  }
+  return '';
+}
+
+function renderRecordatorios() {
+  const f = getFilter();
+  const list = state.recordatorios.filter(x => matchesFilter(x,f));
+  list.sort((a,b) => ({alta:0,media:1,baja:2}[a.priority]??1) - ({alta:0,media:1,baja:2}[b.priority]??1));
+  document.getElementById('count-recordatorios').textContent = state.recordatorios.length;
+  const el = document.getElementById('list-recordatorios');
+  el.innerHTML = list.length ? list.map(i => itemCardHTML(i,'recordatorios')).join('') :
+    '<div class="empty"><i class="ti ti-calendar-off"></i><p>No hay recordatorios aún</p></div>';
+}
+
+function renderCompras() {
+  const f = getFilter();
+  const list = state.compras.filter(x => matchesFilter(x,f));
+  document.getElementById('count-compras').textContent = state.compras.length;
+  const el = document.getElementById('list-compras');
+  if (!list.length) { el.innerHTML = '<div class="empty"><i class="ti ti-shopping-bag"></i><p>Lista vacía</p></div>'; return; }
+  const undone = list.filter(x => !x.done), done = list.filter(x => x.done);
+  el.innerHTML = undone.map(i => itemCardHTML(i,'compras')).join('') +
+    (done.length ? `<div style="margin:10px 0 6px;font-size:11px;color:var(--warm-text-light);font-weight:700;letter-spacing:0.5px">COMPRADOS (${done.length})</div>` + done.map(i => itemCardHTML(i,'compras')).join('') : '');
+}
+
+function renderPagos() {
+  const f = getFilter();
+  const list = state.pagos.filter(x => matchesFilter(x,f));
+  list.sort((a,b) => { const na=nextPaymentDate(a.date,a.freq), nb=nextPaymentDate(b.date,b.freq); if(!na) return 1; if(!nb) return -1; return new Date(na)-new Date(nb); });
+  document.getElementById('count-pagos').textContent = state.pagos.length;
+  const el = document.getElementById('list-pagos');
+  el.innerHTML = list.length ? list.map(i => itemCardHTML(i,'pagos')).join('') :
+    '<div class="empty"><i class="ti ti-credit-card-off"></i><p>No hay pagos registrados</p></div>';
+}
+
+function renderCumpleanos() {
+  const f = getFilter();
+  const list = state.cumpleanos.filter(x => matchesFilter(x,f));
+  list.sort((a,b) => { const da=daysUntilBirthday(a.date)??999, db=daysUntilBirthday(b.date)??999; return da-db; });
+  document.getElementById('count-cumpleanos').textContent = state.cumpleanos.length;
+  const el = document.getElementById('list-cumpleanos');
+  el.innerHTML = list.length ? list.map(i => itemCardHTML(i,'cumpleanos')).join('') :
+    '<div class="empty"><i class="ti ti-cake"></i><p>No hay cumpleaños guardados</p></div>';
+}
+
+function updateBadges() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  // compras: items pendientes
+  const compPend = state.compras.filter(x => !x.done).length;
+  const bc = document.getElementById('badge-compras');
+  bc.style.display = compPend ? 'flex' : 'none';
+  bc.textContent = compPend > 9 ? '9+' : compPend;
+  // pagos: próximos 7 días
+  const pagAlert = state.pagos.filter(p => {
+    if (!p.date) return false;
+    const n = nextPaymentDate(p.date, p.freq);
+    return n && Math.round((new Date(n)-now)/86400000) <= 7;
+  }).length;
+  const bp = document.getElementById('badge-pagos');
+  bp.style.display = pagAlert ? 'flex' : 'none';
+  bp.textContent = pagAlert > 9 ? '9+' : pagAlert;
+  // cumpleaños: próximos 7 días
+  const bdAlert = state.cumpleanos.filter(c => { const d=daysUntilBirthday(c.date); return d!==null && d<=7; }).length;
+  const bb = document.getElementById('badge-cumpleanos');
+  bb.style.display = bdAlert ? 'flex' : 'none';
+  bb.textContent = bdAlert > 9 ? '9+' : bdAlert;
+}
+
+// In-app alert banner
+function checkInAppAlerts() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const alerts = [];
+  state.recordatorios.forEach(item => {
+    if (!item.done && item.date) {
+      const diff = Math.round((new Date(item.date)-now)/86400000);
+      if (diff >= 0 && diff <= 3) alerts.push(`📌 ${item.title} — ${diff===0?'hoy':diff===1?'mañana':'en '+diff+' días'}`);
+    }
+  });
+  state.cumpleanos.forEach(item => {
+    const days = daysUntilBirthday(item.date);
+    if (days !== null && days <= 7) alerts.push(`🎂 ${item.title} — ${days===0?'¡hoy!':days===1?'mañana':'en '+days+' días'}`);
+  });
+  state.pagos.forEach(item => {
+    if (item.date) {
+      const next = nextPaymentDate(item.date, item.freq);
+      if (next) {
+        const diff = Math.round((new Date(next)-now)/86400000);
+        if (diff >= 0 && diff <= 5) alerts.push(`💳 ${item.title} — ${diff===0?'vence hoy':diff===1?'mañana':'en '+diff+' días'}`);
+      }
+    }
+  });
+  const al = document.getElementById('notifAlert');
+  if (alerts.length) {
+    al.classList.add('show');
+    document.getElementById('notifList').innerHTML = alerts.map(a=>`<div style="padding:2px 0">${a}</div>`).join('');
+  } else {
+    al.classList.remove('show');
+  }
+}
+
+// ========================
+// ACTIONS
+// ========================
+function toggleDone(type, id) {
+  const item = state[type].find(x => x.id === id);
+  if (item) { item.done = !item.done; save(); renderAll(); }
+}
+function deleteItem(type, id) {
+  if (!confirm('¿Eliminar este elemento?')) return;
+  state[type] = state[type].filter(x => x.id !== id);
+  save(); renderAll(); checkInAppAlerts();
+  showToast('Eliminado');
+}
+function editItem(type, id) {
+  const item = state[type].find(x => x.id === id);
+  if (!item) return;
+  editTarget = id;
+  const formMap = {recordatorios:'rec-form',compras:'shop-form',pagos:'pay-form',cumpleanos:'bday-form'};
+  const fid = formMap[type];
+  document.getElementById(fid).classList.add('open');
+  if (type === 'recordatorios') {
+    document.getElementById('rec-title').value = item.title;
+    document.getElementById('rec-date').value = item.date||'';
+    document.getElementById('rec-comment').value = item.comment||'';
+    currentPriority = item.priority||'media';
+    document.querySelectorAll('.priority-btn').forEach(b => { b.classList.remove('sel'); if(b.classList.contains(currentPriority)) b.classList.add('sel'); });
+  } else if (type === 'compras') {
+    document.getElementById('shop-title').value = item.title;
+    document.getElementById('shop-qty').value = item.qty||'';
+    document.getElementById('shop-comment').value = item.comment||'';
+  } else if (type === 'pagos') {
+    document.getElementById('pay-title').value = item.title;
+    document.getElementById('pay-amount').value = item.amount||'';
+    document.getElementById('pay-date').value = item.date||'';
+    document.getElementById('pay-freq').value = item.freq||'mensual';
+    document.getElementById('pay-comment').value = item.comment||'';
+  } else if (type === 'cumpleanos') {
+    document.getElementById('bday-title').value = item.title;
+    document.getElementById('bday-date').value = item.date||'';
+    document.getElementById('bday-comment').value = item.comment||'';
+  }
+  document.getElementById(fid).scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function clearDoneShop() {
+  const count = state.compras.filter(x=>x.done).length;
+  if (!count) { showToast('No hay items comprados para limpiar'); return; }
+  state.compras = state.compras.filter(x => !x.done);
+  save(); renderAll();
+  showToast(`✓ ${count} item${count>1?'s':''} eliminado${count>1?'s':''}`);
+}
+
+// ========================
+// DARK MODE
+// ========================
+function toggleDark() {
+  darkMode = !darkMode;
+  document.body.classList.toggle('dark', darkMode);
+  document.getElementById('darkBtn').innerHTML = darkMode ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
+  document.getElementById('themeMetaColor').content = darkMode ? '#1A1108' : '#D4782A';
+  localStorage.setItem('miagenda-dark', darkMode?'1':'0');
+}
+
+// ========================
+// EXPORT / IMPORT
+// ========================
+function exportData() {
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `miagenda-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('✓ Datos exportados');
+}
+function importData(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.recordatorios !== undefined || d.compras !== undefined) {
+        state = { recordatorios:d.recordatorios||[], compras:d.compras||[], pagos:d.pagos||[], cumpleanos:d.cumpleanos||[] };
+        save(); renderAll(); checkInAppAlerts();
+        showToast('✓ ¡Datos importados!', 3000);
+      } else { showToast('⚠ Archivo inválido'); }
+    } catch(err) { showToast('⚠ Error al leer el archivo'); }
+    e.target.value='';
+  };
+  r.readAsText(file);
+}
+
+// ========================
+// TOAST
+// ========================
+let toastTimer = null;
+function showToast(msg, dur=2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+init();
+</script>
+<!-- Firebase SDK (compat) — cargado al final para no bloquear render -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+</body>
+</html>
